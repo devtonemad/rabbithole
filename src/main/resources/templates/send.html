@@ -20,8 +20,19 @@
             const renderSentMessages = () => {
                 const tbody = document.querySelector('#sentMessagesTable tbody');
                 tbody.innerHTML = '';
-                sentMessages.forEach(msg => {
+                sentMessages.forEach((msg, index) => {
                     const tr = document.createElement('tr');
+                    const useButtonTd = document.createElement('td');
+                    const useButton = document.createElement('button');
+                    useButton.textContent = 'Use';
+                    useButton.addEventListener('click', () => {
+                        document.getElementById('destinationType').value = msg.destinationType;
+                        document.getElementById('destination').value = msg.destination;
+                        document.getElementById('routingKey').value = msg.routingKey || '';
+                        document.getElementById('headers').value = msg.headers || '';
+                        document.getElementById('message').value = msg.message;
+                    });
+                    useButtonTd.appendChild(useButton);
                     const destinationTypeTd = document.createElement('td');
                     destinationTypeTd.textContent = msg.destinationType;
                     const destinationTd = document.createElement('td');
@@ -32,6 +43,7 @@
                     headersTd.textContent = msg.headers || '';
                     const messageTd = document.createElement('td');
                     messageTd.textContent = msg.message;
+                    tr.appendChild(useButtonTd);
                     tr.appendChild(destinationTypeTd);
                     tr.appendChild(destinationTd);
                     tr.appendChild(routingKeyTd);
@@ -90,6 +102,7 @@
 <table id="sentMessagesTable">
     <thead>
     <tr>
+        <th>Action</th>
         <th>Destination Type</th>
         <th>Destination</th>
         <th>Routing Key</th>
