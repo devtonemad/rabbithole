@@ -7,8 +7,18 @@
 <body>
 <h1>Send Message</h1>
 <form th:action="@{/send}" method="post">
-    <label for="queueName">Queue Name:</label>
-    <input type="text" id="queueName" name="queueName" required><br><br>
+    <label for="destinationType">Destination Type:</label>
+    <select id="destinationType" name="destinationType" required>
+        <option value="queue">Queue</option>
+        <option value="exchange">Exchange</option>
+        <option value="stream">Stream</option>
+    </select><br><br>
+    <label for="destination">Destination Name:</label>
+    <input type="text" id="destination" name="destination" required><br><br>
+    <label for="routingKey">Routing Key:</label>
+    <input type="text" id="routingKey" name="routingKey"><br><br>
+    <label for="headers">Headers (key:value, key:value):</label>
+    <input type="text" id="headers" name="headers"><br><br>
     <label for="message">Message:</label>
     <textarea id="message" name="message" required></textarea><br><br>
     <button type="submit">Send</button>
