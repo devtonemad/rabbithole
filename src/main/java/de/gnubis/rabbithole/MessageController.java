@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class MessageController {
     private RabbitMQReceiver rabbitMQReceiver;
 
     @GetMapping("/send")
-    public String sendPage() {
+    public String sendPage(Model model) {
         return "send";
     }
 
@@ -30,7 +31,7 @@ public class MessageController {
                               @RequestParam("routingKey") String routingKey,
                               @RequestParam("message") String message,
                               @RequestParam("headers") String headers,
-                              Model model) {
+                              RedirectAttributes redirectAttributes) {
         Map<String, Object> headersMap = new HashMap<>();
         if (!headers.isEmpty()) {
             String[] headersArray = headers.split(",");
@@ -50,14 +51,14 @@ public class MessageController {
             rabbitMQSender.sendToStream(destination, message);
         }
 
-        // Pass the selected values back to the view
-        model.addAttribute("destinationType", destinationType);
-        model.addAttribute("destination", destination);
-        model.addAttribute("routingKey", routingKey);
-        model.addAttribute("headers", headers);
-        model.addAttribute("message", message);
+        // Add attributes to the redirect
+        redirectAttributes.addFlashAttribute("destinationType", destinationType);
+        redirectAttributes.addFlashAttribute("destination", destination);
+        redirectAttributes.addFlashAttribute("routingKey", routingKey);
+        redirectAttributes.addFlashAttribute("headers", headers);
+        redirectAttributes.addFlashAttribute("message", message);
 
-        return "send";
+        return "redirect:/send";
     }
 
     @GetMapping("/receive")
