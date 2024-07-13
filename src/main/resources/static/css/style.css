@@ -4,7 +4,7 @@ body {
     color: #333;
 }
 
-h1 {
+h1, h2 {
     color: #003366;
 }
 
@@ -12,9 +12,10 @@ form {
     background-color: #e0e7ef;
     padding: 20px;
     border-radius: 5px;
+    margin-bottom: 20px;
 }
 
-input, textarea {
+input, textarea, select {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
@@ -42,4 +43,23 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ccc;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f0f4f7;
 }
