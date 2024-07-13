@@ -22,9 +22,21 @@
                 tbody.innerHTML = '';
                 sentMessages.forEach(msg => {
                     const tr = document.createElement('tr');
-                    const td = document.createElement('td');
-                    td.textContent = msg;
-                    tr.appendChild(td);
+                    const destinationTypeTd = document.createElement('td');
+                    destinationTypeTd.textContent = msg.destinationType;
+                    const destinationTd = document.createElement('td');
+                    destinationTd.textContent = msg.destination;
+                    const routingKeyTd = document.createElement('td');
+                    routingKeyTd.textContent = msg.routingKey || '';
+                    const headersTd = document.createElement('td');
+                    headersTd.textContent = msg.headers || '';
+                    const messageTd = document.createElement('td');
+                    messageTd.textContent = msg.message;
+                    tr.appendChild(destinationTypeTd);
+                    tr.appendChild(destinationTd);
+                    tr.appendChild(routingKeyTd);
+                    tr.appendChild(headersTd);
+                    tr.appendChild(messageTd);
                     tbody.appendChild(tr);
                 });
             };
@@ -38,9 +50,13 @@
                 const headers = formData.get('headers');
                 const message = formData.get('message');
 
-                let messageInfo = `Destination Type: ${destinationType}, Destination: ${destination}, Message: ${message}`;
-                if (routingKey) messageInfo += `, Routing Key: ${routingKey}`;
-                if (headers) messageInfo += `, Headers: ${headers}`;
+                const messageInfo = {
+                    destinationType,
+                    destination,
+                    routingKey,
+                    headers,
+                    message
+                };
 
                 updateSentMessages(messageInfo);
 
@@ -74,7 +90,11 @@
 <table id="sentMessagesTable">
     <thead>
     <tr>
-        <th>Message Details</th>
+        <th>Destination Type</th>
+        <th>Destination</th>
+        <th>Routing Key</th>
+        <th>Headers</th>
+        <th>Message</th>
     </tr>
     </thead>
     <tbody>
