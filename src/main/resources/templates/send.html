@@ -3,6 +3,53 @@
 <head>
     <title>Send Message</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector('form');
+            const sentMessages = JSON.parse(localStorage.getItem('sentMessages')) || [];
+
+            const updateSentMessages = (message) => {
+                if (sentMessages.length >= 10) {
+                    sentMessages.pop();
+                }
+                sentMessages.unshift(message);
+                localStorage.setItem('sentMessages', JSON.stringify(sentMessages));
+                renderSentMessages();
+            };
+
+            const renderSentMessages = () => {
+                const tbody = document.querySelector('#sentMessagesTable tbody');
+                tbody.innerHTML = '';
+                sentMessages.forEach(msg => {
+                    const tr = document.createElement('tr');
+                    const td = document.createElement('td');
+                    td.textContent = msg;
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
+                });
+            };
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const destinationType = formData.get('destinationType');
+                const destination = formData.get('destination');
+                const routingKey = formData.get('routingKey');
+                const headers = formData.get('headers');
+                const message = formData.get('message');
+
+                let messageInfo = `Destination Type: ${destinationType}, Destination: ${destination}, Message: ${message}`;
+                if (routingKey) messageInfo += `, Routing Key: ${routingKey}`;
+                if (headers) messageInfo += `, Headers: ${headers}`;
+
+                updateSentMessages(messageInfo);
+
+                form.submit();
+            });
+
+            renderSentMessages();
+        });
+    </script>
 </head>
 <body>
 <h1>Send Message</h1>
@@ -23,6 +70,17 @@
     <textarea id="message" name="message" required th:text="${message}"></textarea><br><br>
     <button type="submit">Send</button>
 </form>
+<h2>Latest Sent Messages</h2>
+<table id="sentMessagesTable">
+    <thead>
+    <tr>
+        <th>Message Details</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Messages will be populated here by JavaScript -->
+    </tbody>
+</table>
 <a th:href="@{/receive}">View Received Messages</a>
 </body>
 </html>
