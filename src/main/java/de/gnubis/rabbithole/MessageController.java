@@ -1,6 +1,5 @@
 package de.gnubis.rabbithole;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,7 +29,8 @@ public class MessageController {
                               @RequestParam("destination") String destination,
                               @RequestParam("routingKey") String routingKey,
                               @RequestParam("message") String message,
-                              @RequestParam("headers") String headers) {
+                              @RequestParam("headers") String headers,
+                              Model model) {
         Map<String, Object> headersMap = new HashMap<>();
         if (!headers.isEmpty()) {
             String[] headersArray = headers.split(",");
@@ -49,7 +49,15 @@ public class MessageController {
         } else if (destinationType.equals("stream")) {
             rabbitMQSender.sendToStream(destination, message);
         }
-        return "redirect:/send";
+
+        // Pass the selected values back to the view
+        model.addAttribute("destinationType", destinationType);
+        model.addAttribute("destination", destination);
+        model.addAttribute("routingKey", routingKey);
+        model.addAttribute("headers", headers);
+        model.addAttribute("message", message);
+
+        return "send";
     }
 
     @GetMapping("/receive")
