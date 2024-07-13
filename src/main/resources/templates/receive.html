@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Receive Messages</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<h1>Received Messages</h1>
+<ul>
+    <li th:each="message : ${messages}">
+        <p th:text="${message}"></p>
+    </li>
+</ul>
+<a th:href="@{/send}">Send a Message</a>
+</body>
+</html>

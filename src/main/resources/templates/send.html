@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Send Message</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<h1>Send Message</h1>
+<form th:action="@{/send}" method="post">
+    <label for="queueName">Queue Name:</label>
+    <input type="text" id="queueName" name="queueName" required><br><br>
+    <label for="message">Message:</label>
+    <textarea id="message" name="message" required></textarea><br><br>
+    <button type="submit">Send</button>
+</form>
+<a th:href="@{/receive}">View Received Messages</a>
+</body>
+</html>
