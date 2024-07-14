@@ -20,6 +20,11 @@ public class MessageController {
     @Autowired
     private RabbitMQReceiver rabbitMQReceiver;
 
+    @GetMapping("/")
+    public String homePage() {
+        return "index";
+    }
+
     @GetMapping("/send")
     public String sendPage(Model model) {
         return "send";

@@ -7,6 +7,7 @@ body {
 header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     background-color: #4c9a2a; /* Match the green in the logo */
     padding: 10px 20px;
     margin-bottom: 20px;
@@ -18,8 +19,22 @@ header .logo {
     margin-right: 20px;
 }
 
+header nav button {
+    background-color: #ff9800; /* Orange color from the logo */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+header nav button:hover {
+    background-color: #e68900; /* Darker orange for hover effect */
+}
+
 h1, h2 {
-    color: #ffffff; /* White text color for better contrast */
+    color: #333; /* Black text color */
 }
 
 form {
@@ -91,4 +106,9 @@ td button {
 
 td button:hover {
     background-color: #e68900; /* Darker orange for hover effect */
+}
+
+.content {
+    text-align: center;
+    padding: 50px;
 }
