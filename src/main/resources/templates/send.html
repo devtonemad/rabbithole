@@ -80,7 +80,10 @@
     </script>
 </head>
 <body>
-<h1>Send Message</h1>
+<header>
+    <img src="/images/logo.png" alt="Logo" class="logo">
+    <h1>Send Message</h1>
+</header>
 <form th:action="@{/send}" method="post">
     <label for="destinationType">Destination Type:</label>
     <select id="destinationType" name="destinationType" required>

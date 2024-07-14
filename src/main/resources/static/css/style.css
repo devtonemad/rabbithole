@@ -1,15 +1,29 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f4f7;
+    background-color: #f2f2f2;
     color: #333;
 }
 
+header {
+    display: flex;
+    align-items: center;
+    background-color: #4c9a2a; /* Match the green in the logo */
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+header .logo {
+    height: 100px; /* Set the logo height to 100px */
+    margin-right: 20px;
+}
+
 h1, h2 {
-    color: #003366;
+    color: #ffffff; /* White text color for better contrast */
 }
 
 form {
-    background-color: #e0e7ef;
+    background-color: #6fbf4b; /* Lighter green to complement the header */
     padding: 20px;
     border-radius: 5px;
     margin-bottom: 20px;
@@ -24,7 +38,7 @@ input, textarea, select {
 }
 
 button {
-    background-color: #0073e6;
+    background-color: #ff9800; /* Orange color from the logo */
     color: white;
     border: none;
     padding: 10px 20px;
@@ -33,11 +47,11 @@ button {
 }
 
 button:hover {
-    background-color: #005bb5;
+    background-color: #e68900; /* Darker orange for hover effect */
 }
 
 a {
-    color: #0073e6;
+    color: #ff9800; /* Orange color from the logo */
     text-decoration: none;
 }
 
@@ -62,12 +76,13 @@ th, td {
 }
 
 th {
-    background-color: #f0f4f7;
+    background-color: #4c9a2a; /* Match the green in the logo */
+    color: #ffffff; /* White text color for better contrast */
 }
 
 td button {
     padding: 5px 10px;
-    background-color: #0073e6;
+    background-color: #ff9800; /* Orange color from the logo */
     color: white;
     border: none;
     border-radius: 3px;
@@ -75,5 +90,5 @@ td button {
 }
 
 td button:hover {
-    background-color: #005bb5;
+    background-color: #e68900; /* Darker orange for hover effect */
 }

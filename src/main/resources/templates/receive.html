@@ -5,12 +5,22 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>Received Messages</h1>
-<ul>
-    <li th:each="message : ${messages}">
-        <p th:text="${message}"></p>
-    </li>
-</ul>
+<header>
+    <img src="/images/logo.png" alt="Logo" class="logo">
+    <h1>Received Messages</h1>
+</header>
+<table>
+    <thead>
+    <tr>
+        <th>Message</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="message : ${messages}">
+        <td th:text="${message}"></td>
+    </tr>
+    </tbody>
+</table>
 <a th:href="@{/send}">Send a Message</a>
 </body>
 </html>
