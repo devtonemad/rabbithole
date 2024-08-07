@@ -1,0 +1,28 @@
+{
+  "rabbit_version": "3.11.0",
+  "users": [
+    {
+      "name": "guest",
+      "password": "guest",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "plugins": [
+    "rabbitmq_management",
+    "rabbitmq_stream"
+  ]
+}
