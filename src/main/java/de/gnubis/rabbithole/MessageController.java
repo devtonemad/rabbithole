@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -68,7 +69,17 @@ public class MessageController {
 
     @GetMapping("/receive")
     public String receivePage(Model model) {
-        model.addAttribute("messages", rabbitMQReceiver.getMessages());
+        return "receive";
+    }
+
+    @PostMapping("/receive")
+    public String readMessages(@RequestParam("sourceType") String sourceType,
+                               @RequestParam("source") String source,
+                               Model model) {
+        List<String> messages = rabbitMQReceiver.receiveMessages(sourceType, source);
+        model.addAttribute("messages", messages);
+        model.addAttribute("sourceType", sourceType);
+        model.addAttribute("source", source);
         return "receive";
     }
 }
