@@ -22,6 +22,7 @@ public class RabbitMQReceiver {
                 .host("localhost")
                 .username("guest")
                 .password("guest")
+                .port(5552)
                 .build();
     }
 
@@ -36,6 +37,7 @@ public class RabbitMQReceiver {
             // Implement stream reading logic here
             Consumer consumer = environment.consumerBuilder()
                     .stream(source)
+                    .offset(OffsetSpecification.first())
                     .messageHandler((context, message) -> {
                         String content = new String(message.getBodyAsBinary());
                         synchronized (messages) {
@@ -55,4 +57,5 @@ public class RabbitMQReceiver {
         }
         return messages;
     }
+
 }
