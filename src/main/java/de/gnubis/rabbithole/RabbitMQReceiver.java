@@ -1,7 +1,9 @@
 package de.gnubis.rabbithole;
 
 import com.rabbitmq.stream.*;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
@@ -14,15 +16,33 @@ public class RabbitMQReceiver {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Value("${spring.rabbitmq.host}")
+    private String host;
+
+    @Value("${spring.rabbitmq.username}")
+    private String username;
+
+    @Value("${spring.rabbitmq.password}")
+    private String password;
+
+    @Value("${spring.rabbitmq.stream.port}")
+    private int port;
+
     private Environment environment;
 
     public RabbitMQReceiver() {
+        // The environment will be initialized in the init method
+        this.environment = null;
+    }
+
+    @PostConstruct
+    public void init() {
         // Create the environment to interact with the stream
         this.environment = Environment.builder()
-                .host("localhost")
-                .username("guest")
-                .password("guest")
-                .port(5552)
+                .host(host)
+                .username(username)
+                .password(password)
+                .port(port)
                 .build();
     }
 
