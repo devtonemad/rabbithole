@@ -23,6 +23,9 @@
   ],
   "plugins": [
     "rabbitmq_management",
-    "rabbitmq_stream"
+    "rabbitmq_stream",
+    "rabbitmq-plugins",
+    "rabbitmq_shovel",
+    "rabbitmq_shovel_management"
   ]
 }
