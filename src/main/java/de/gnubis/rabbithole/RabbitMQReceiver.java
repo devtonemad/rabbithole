@@ -2,6 +2,9 @@ package de.gnubis.rabbithole;
 
 import com.rabbitmq.stream.*;
 import jakarta.annotation.PostConstruct;
+
+import java.util.Collections;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -59,7 +62,7 @@ public class RabbitMQReceiver {
                     .stream(source)
                     .offset(OffsetSpecification.first())
                     .messageHandler((context, message) -> {
-                        String content = new String(message.getBodyAsBinary());
+                        String content = "[Offset: " + context.offset() + "] " + new String(message.getBodyAsBinary());
                         synchronized (messages) {
                             messages.add(content);
                         }
@@ -75,6 +78,7 @@ public class RabbitMQReceiver {
 
             consumer.close();
         }
+        Collections.reverse(messages);
         return messages;
     }
 
