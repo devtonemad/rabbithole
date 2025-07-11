@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Blinker Demo</title>
+    <style>
+        :root {
+            --background-color: #ffffff;
+            --text-color: #000000;
+            --blinker-color: red;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: #1a1a1a;
+                --text-color: #ffffff;
+                --blinker-color: #ff4444;
+            }
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .blinker {
+            width: 100px;
+            height: 100px;
+            background-color: var(--blinker-color);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .blinker.on {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+<div id="blinker" class="blinker"></div>
+<script>
+    const eventSource = new EventSource('/events');
+    const blinker = document.getElementById('blinker');
+
+    eventSource.onmessage = event => {
+        if (event.data === 'on') {
+            blinker.classList.add('on');
+        } else if (event.data === 'off') {
+            blinker.classList.remove('on');
+        }
+    };
+
+    eventSource.onerror = error => {
+        console.error("EventSource failed:", error);
+    };
+</script>
+</body>
+</html>
