@@ -16,12 +16,14 @@
     <h1>Receive Messages</h1>
     <form th:action="@{/receive}" method="post">
         <label for="sourceType">Source Type:</label>
-        <select id="sourceType" name="sourceType" required>
+        <select id="sourceType" name="sourceType" required style="width: 100%; max-width: 300px;">
             <option value="queue" th:selected="${sourceType == 'queue'}">Queue</option>
             <option value="stream" th:selected="${sourceType == 'stream'}">Stream</option>
-        </select><br><br>
+        </select>
+        <br><br>
         <label for="source">Source Name:</label>
-        <input type="text" id="source" name="source" th:value="${source}" required><br><br>
+        <input type="text" id="source" name="source" th:value="${source}" required
+               style="width: 100%; max-width: 300px;"><br><br>
         <button type="submit">Read Messages</button>
     </form>
     <h2>Received Messages</h2>
