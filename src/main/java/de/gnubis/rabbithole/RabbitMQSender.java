@@ -18,14 +18,13 @@ public class RabbitMQSender {
 
     public void sendToExchange(String exchange, String routingKey, String message, Map<String, Object> headers) {
         MessageProperties messageProperties = new MessageProperties();
-        if (headers != null) {
+        if (headers != null && !headers.isEmpty()) {
             headers.forEach(messageProperties::setHeader);
         }
-        Message amqpMessage = new Message(message.getBytes(), messageProperties);
-        rabbitTemplate.send(exchange, routingKey, amqpMessage);
+        rabbitTemplate.send(exchange, routingKey, new Message(message.getBytes(), messageProperties));
     }
 
     public void sendToStream(String stream, String message) {
-        sendToQueue(stream, message);
+        rabbitTemplate.convertAndSend(stream, message);
     }
 }
