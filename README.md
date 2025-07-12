@@ -7,7 +7,7 @@ This project is a Spring MVC and Jakarta EE based web application for messaging 
 
 ## Usage
 
-- Run the docker compose via ```docker compose up -d``` so you have a rabbit running loacally for testingg
+- Run the docker compose via ```docker compose up -d``` so you have a rabbit running locally for testing
 - Adjust configuration at application.properties file if needed
 - Create the wanted exchanges, queues or streams inside rabbit (user:guest password:guest)
 - Run the application on a local server (default port 8080)
