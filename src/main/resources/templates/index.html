@@ -17,12 +17,106 @@
 
         .left {
             border-right: 1px solid #ccc;
+            width: 800px;
+            flex: none;
+            overflow-y: auto;
         }
 
         .right {
             border-left: 1px solid #ccc;
+            flex: 1;
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector('form');
+            const sentMessages = JSON.parse(localStorage.getItem('sentMessages')) || [];
+
+            const updateSentMessages = (message) => {
+                if (sentMessages.length >= 10) {
+                    sentMessages.pop();
+                }
+                sentMessages.unshift(message);
+                localStorage.setItem('sentMessages', JSON.stringify(sentMessages));
+                renderSentMessages();
+            };
+
+            const renderSentMessages = () => {
+                const tbody = document.querySelector('#sentMessagesTable tbody');
+                tbody.innerHTML = '';
+                sentMessages.forEach((msg, index) => {
+                    const tr = document.createElement('tr');
+                    const useButtonTd = document.createElement('td');
+                    const useButton = document.createElement('button');
+                    useButton.textContent = 'Use';
+                    useButton.addEventListener('click', () => {
+                        document.getElementById('destinationType').value = msg.destinationType;
+                        document.getElementById('destination').value = msg.destination;
+                        document.getElementById('routingKey').value = msg.routingKey || '';
+                        document.getElementById('headers').value = msg.headers || '';
+                        document.getElementById('message').value = msg.message;
+                    });
+                    useButtonTd.appendChild(useButton);
+                    const destinationTypeTd = document.createElement('td');
+                    destinationTypeTd.textContent = msg.destinationType;
+                    const destinationTd = document.createElement('td');
+                    destinationTd.textContent = msg.destination;
+                    const routingKeyTd = document.createElement('td');
+                    routingKeyTd.textContent = msg.routingKey || '';
+                    const headersTd = document.createElement('td');
+                    headersTd.textContent = msg.headers || '';
+                    const messageTd = document.createElement('td');
+                    messageTd.textContent = msg.message;
+                    tr.appendChild(useButtonTd);
+                    tr.appendChild(destinationTypeTd);
+                    tr.appendChild(destinationTd);
+                    tr.appendChild(routingKeyTd);
+                    tr.appendChild(headersTd);
+                    tr.appendChild(messageTd);
+                    tbody.appendChild(tr);
+                });
+            };
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const destinationType = formData.get('destinationType');
+                const destination = formData.get('destination');
+                const routingKey = formData.get('routingKey');
+                const headers = formData.get('headers');
+                const message = formData.get('message');
+
+                const messageInfo = {
+                    destinationType,
+                    destination,
+                    routingKey,
+                    headers,
+                    message
+                };
+
+                updateSentMessages(messageInfo);
+
+                fetch('/send', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert('Message sent successfully!');
+                            form.reset();
+                        } else {
+                            alert('Failed to send message.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error sending message.');
+                    });
+            });
+
+            renderSentMessages();
+        });
+    </script>
 </head>
 <body>
 <header>
@@ -34,7 +128,42 @@
         <div class="split-panel left">
             <h2>Send Message</h2>
             <div id="sendSection">
-                <!-- Send message form will be here -->
+                
+                <form th:action="@{/send}" method="post">
+                    <label for="destinationType">Destination Type:</label>
+                    <select id="destinationType" name="destinationType" required>
+                        <option value="queue" th:selected="${destinationType == 'queue'}">Queue</option>
+                        <option value="exchange" th:selected="${destinationType == 'exchange'}">Exchange</option>
+                        <option value="stream" th:selected="${destinationType == 'stream'}">Stream</option>
+                    </select><br><br>
+                    <label for="destination">Destination Name:</label>
+                    <input type="text" id="destination" name="destination" th:value="${destination}" required><br><br>
+                    <label for="routingKey">Routing Key:</label>
+                    <input type="text" id="routingKey" name="routingKey" th:value="${routingKey}"><br><br>
+                    <label for="headers">Headers (key:value, key:value):</label>
+                    <input type="text" id="headers" name="headers" th:value="${headers}"><br><br>
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" required th:text="${message}"></textarea><br><br>
+                    <button type="submit">Send</button>
+                </form>
+                <h2>Latest Sent Messages</h2>
+                <div style="overflow-x: auto; width: 100%;">
+                <table id="sentMessagesTable">
+                    <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Destination Type</th>
+                        <th>Destination</th>
+                        <th>Routing Key</th>
+                        <th>Headers</th>
+                        <th>Message</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Messages will be populated here by JavaScript -->
+                    </tbody>
+                </table>
+                </div>
             </div>
         </div>
         <div class="split-panel right">
