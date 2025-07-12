@@ -5,22 +5,19 @@
     <title>Blinker Demo</title>
     <style>
         :root {
-            --background-color: #ffffff;
-            --text-color: #000000;
             --blinker-color: red;
+            --background-color: #ffffff;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --background-color: #1a1a1a;
-                --text-color: #ffffff;
                 --blinker-color: #ff4444;
+                --background-color: #1a1a1a;
             }
         }
 
         body {
             background-color: var(--background-color);
-            color: var(--text-color);
         }
 
         .blinker {
@@ -35,7 +32,7 @@
         }
     </style>
 </head>
-<body class="dark-mode">
+<body>
 <div id="blinker" class="blinker"></div>
 <script>
     const eventSource = new EventSource('/events');
