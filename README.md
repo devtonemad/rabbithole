@@ -21,6 +21,3 @@ This project is a Spring MVC and Jakarta EE based web application for messaging 
 - `src/main/resources/static/images/` — Application images, including the logo
 - `src/main/resources/templates/` — Thymeleaf HTML templates for the frontend UI
 
-## How to Customize Header Styles
-
-Modify the `header` CSS selector in `src/main/resources/static/css/style.css`:
