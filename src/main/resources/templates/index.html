@@ -24,11 +24,48 @@
 
         .right {
             border-left: 1px solid #ccc;
-            flex: 1;
+            width: 800px;
+            flex: none;
+            overflow-y: auto;
         }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const receiveForm = document.getElementById('receiveForm');
+            const receivedMessagesBody = document.getElementById('receivedMessagesBody');
+
+            receiveForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(receiveForm);
+
+                fetch('/receive', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.text())
+                    .then(htmlContent => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(htmlContent, 'text/html');
+                        const messages = Array.from(doc.querySelectorAll('table tbody tr td')).map(td => td.textContent);
+
+                        receivedMessagesBody.innerHTML = '';
+                        messages.forEach(message => {
+                            const tr = document.createElement('tr');
+                            const td = document.createElement('td');
+                            td.textContent = message;
+                            tr.appendChild(td);
+                            receivedMessagesBody.appendChild(tr);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error parsing response:', error);
+                        alert('Error receiving messages.');
+                    })
+                        .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error receiving messages.');
+                    });
+            });
             const form = document.querySelector('form');
             const sentMessages = JSON.parse(localStorage.getItem('sentMessages')) || [];
 
@@ -169,6 +206,35 @@
         <div class="split-panel right">
             <h2>Receive Messages</h2>
             <div id="receiveSection">
+
+                <div class="content">
+                    <h1>Receive Messages</h1>
+                    <form id="receiveForm" th:action="@{/receive}" method="post">
+                        <label for="sourceType">Source Type:</label>
+                        <select id="sourceType" name="sourceType" required style="width: 100%; max-width: 750px;">
+                        <option value="queue" th:selected="${sourceType == 'queue'}">Queue</option>
+                            <option value="stream" th:selected="${sourceType == 'stream'}">Stream</option>
+                        </select>
+                        <br><br>
+                        <label for="source">Source Name:</label>
+                        <input type="text" id="source" name="source" th:value="${source}" required
+                               style="width: 100%; max-width: 750px;"><br><br>
+                        <button type="submit">Read Messages</button>
+                    </form>
+                    <h2>Received Messages</h2>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Message</th>
+                        </tr>
+                        </thead>
+                        <tbody id="receivedMessagesBody">
+                        <tr th:each="message : ${messages}">
+                            <td th:text="${message}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <!-- Receive messages will be displayed here -->
             </div>
         </div>
