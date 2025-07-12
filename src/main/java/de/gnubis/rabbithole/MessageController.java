@@ -75,11 +75,13 @@ public class MessageController {
     @PostMapping("/receive")
     public String readMessages(@RequestParam("sourceType") String sourceType,
                                @RequestParam("source") String source,
+                               @RequestParam(name = "startOffset", required = false) String startOffset,
                                Model model) {
-        List<String> messages = rabbitMQReceiver.receiveMessages(sourceType, source);
+        List<String> messages = rabbitMQReceiver.receiveMessages(sourceType, source, startOffset);
         model.addAttribute("messages", messages);
         model.addAttribute("sourceType", sourceType);
         model.addAttribute("source", source);
+        model.addAttribute("startOffset", startOffset);
         return "receive";
     }
 }

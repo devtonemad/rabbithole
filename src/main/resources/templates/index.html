@@ -75,10 +75,6 @@
                     .catch(error => {
                         console.error('Error parsing response:', error);
                         alert('Error receiving messages.');
-                    })
-                        .catch(error => {
-                        console.error('Error:', error);
-                        alert('Error receiving messages.');
                     });
             });
             const form = document.querySelector('form');
@@ -180,7 +176,7 @@
         <div class="split-panel left">
             <h2>Send Message</h2>
             <div id="sendSection">
-                
+
                 <form th:action="@{/send}" method="post">
                     <label for="destinationType">Destination Type:</label>
                     <select id="destinationType" name="destinationType" required>
@@ -200,21 +196,21 @@
                 </form>
                 <h2>Latest Sent Messages</h2>
                 <div style="overflow-x: auto; width: 100%;">
-                <table id="sentMessagesTable">
-                    <thead>
-                    <tr>
-                        <th>Action</th>
-                        <th>Destination Type</th>
-                        <th>Destination</th>
-                        <th>Routing Key</th>
-                        <th>Headers</th>
-                        <th>Message</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- Messages will be populated here by JavaScript -->
-                    </tbody>
-                </table>
+                    <table id="sentMessagesTable">
+                        <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Destination Type</th>
+                            <th>Destination</th>
+                            <th>Routing Key</th>
+                            <th>Headers</th>
+                            <th>Message</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Messages will be populated here by JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -230,6 +226,8 @@
                     </select><br><br>
                     <label for="source">Source Name:</label>
                     <input type="text" id="source" name="source" th:value="${source}" required><br><br>
+                    <label for="startOffset">Start Offset:</label>
+                    <input type="text" id="startOffset" name="startOffset" th:value="${startOffset}" placeholder="Leave empty for beginning"><br><br>
                     <button type="submit">Read Messages</button>
                 </form>
                 <h2>Received Messages</h2>
@@ -240,7 +238,7 @@
                             <th>Message</th>
                         </tr>
                         </thead>
-                        <tbody id="receivedMessagesBody">
+                        <tbody id="receivedMessagesBody" >
                         <tr th:each="message : ${messages}">
                             <td th:text="${message}"></td>
                         </tr>

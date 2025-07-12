@@ -49,7 +49,7 @@ public class RabbitMQReceiver {
                 .build();
     }
 
-    public List<String> receiveMessages(String sourceType, String source) {
+    public List<String> receiveMessages(String sourceType, String source, String startOffset) {
         List<String> messages = new ArrayList<>();
         if ("queue".equals(sourceType)) {
             org.springframework.amqp.core.Message message;
@@ -57,10 +57,21 @@ public class RabbitMQReceiver {
                 messages.add(new String(message.getBody()));
             }
         } else if ("stream".equals(sourceType)) {
-            // Implement stream reading logic here
+            OffsetSpecification offsetSpec;
+            if (startOffset != null && !startOffset.isBlank()) {
+                try {
+                    long offsetLong = Long.parseLong(startOffset);
+                    offsetSpec = OffsetSpecification.offset(offsetLong);
+                } catch (NumberFormatException e) {
+                    offsetSpec = OffsetSpecification.first();
+                }
+            } else {
+                offsetSpec = OffsetSpecification.first();
+            }
+
             Consumer consumer = environment.consumerBuilder()
                     .stream(source)
-                    .offset(OffsetSpecification.first())
+                    .offset(offsetSpec)
                     .messageHandler((context, message) -> {
                         String content = "[Offset: " + context.offset() + "] " + new String(message.getBodyAsBinary());
                         synchronized (messages) {
