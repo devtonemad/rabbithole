@@ -1,5 +1,8 @@
 # Rabbithole Web Application
 
+<img width="1469" height="907" alt="image" src="https://github.com/user-attachments/assets/367da709-68ff-49be-a288-861ec0c8ab74" />
+
+
 This project is a Spring MVC and Jakarta EE based web application for messaging with RabbitMQ integration.
 
 ## Header Style Adjustment
