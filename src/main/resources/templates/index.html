@@ -13,20 +13,16 @@
         .split-panel {
             flex: 1;
             padding: 20px;
+            width: 50%;
+            overflow-y: auto;
         }
 
         .left {
             border-right: 1px solid #ccc;
-            width: 800px;
-            flex: none;
-            overflow-y: auto;
         }
 
         .right {
             border-left: 1px solid #ccc;
-            width: 800px;
-            flex: none;
-            overflow-y: auto;
         }
     </style>
     <script>
@@ -207,21 +203,18 @@
             <h2>Receive Messages</h2>
             <div id="receiveSection">
 
-                <div class="content">
-                    <h1>Receive Messages</h1>
-                    <form id="receiveForm" th:action="@{/receive}" method="post">
-                        <label for="sourceType">Source Type:</label>
-                        <select id="sourceType" name="sourceType" required style="width: 100%; max-width: 750px;">
+                <form id="receiveForm" th:action="@{/receive}" method="post">
+                    <label for="sourceType">Source Type:</label>
+                    <select id="sourceType" name="sourceType" required>
                         <option value="queue" th:selected="${sourceType == 'queue'}">Queue</option>
-                            <option value="stream" th:selected="${sourceType == 'stream'}">Stream</option>
-                        </select>
-                        <br><br>
-                        <label for="source">Source Name:</label>
-                        <input type="text" id="source" name="source" th:value="${source}" required
-                               style="width: 100%; max-width: 750px;"><br><br>
-                        <button type="submit">Read Messages</button>
-                    </form>
-                    <h2>Received Messages</h2>
+                        <option value="stream" th:selected="${sourceType == 'stream'}">Stream</option>
+                    </select><br><br>
+                    <label for="source">Source Name:</label>
+                    <input type="text" id="source" name="source" th:value="${source}" required><br><br>
+                    <button type="submit">Read Messages</button>
+                </form>
+                <h2>Received Messages</h2>
+                <div style="overflow-x: auto; width: 100%;">
                     <table>
                         <thead>
                         <tr>
