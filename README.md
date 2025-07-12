@@ -5,20 +5,13 @@
 
 This project is a Spring MVC and Jakarta EE based web application for messaging with RabbitMQ integration.
 
-## Header Style Adjustment
-
-The header design was updated to better align with the new logo. Changes include:
-
-- Background color changed to a warm brown (`#7b4f24`)
-- Header text color updated to carrot orange (`#ff9800`)
-- Table header background color also updated to brown with white text for better contrast
-
-These changes improve visual cohesion with the logo and enhance the user interface aesthetics.
-
 ## Usage
 
+- Run the docker compose via ```docker compose up -d``` so you have a rabbit running loacally for testingg
+- Adjust configuration at application.properties file if needed
+- Create the wanted exchanges, queues or streams inside rabbit (user:guest password:guest)
 - Run the application on a local server (default port 8080)
-- Navigate to the homepage where the updated header style is visible
+- Navigate to the homepage localhost:8080
 - Send, receive, and manage messages through the UI
 
 ## Project Structure
