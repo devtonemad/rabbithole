@@ -172,6 +172,32 @@
     <h1>RabbitHole</h1>
 </header>
 <div class="content">
+    <!-- Connection Settings Panel -->
+    <div id="connectionPanel" style="margin-bottom: 30px; padding: 20px; border: 1px solid #ccc; border-radius: 5px; background-color: #e9f4e9;">
+        <h2>Connection Settings</h2>
+        <form id="connectionForm">
+            <label for="host">Host:</label>
+            <input type="text" id="host" name="host" value="localhost" required><br><br>
+
+            <label for="port">Port:</label>
+            <input type="number" id="port" name="port" value="5672" required><br><br>
+
+            <label for="streamPort">Stream Port:</label>
+            <input type="number" id="streamPort" name="streamPort" value="5552" required><br><br>
+
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="guest" required><br><br>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" value="guest" required><br><br>
+
+            <button type="button" id="connectBtn">Connect</button>
+            <button type="button" id="disconnectBtn" disabled>Disconnect</button>
+            <span id="connectionStatus" style="margin-left: 15px; font-weight: bold; color: green;"></span>
+        </form>
+    </div>
+
+    <!-- Existing send/receive UI as is below -->
     <div class="split-container">
         <div class="split-panel left">
             <h2>Send Message</h2>
