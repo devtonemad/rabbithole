@@ -1,10 +1,20 @@
 package de.gnubis.rabbithole;
-import org.springframework.beans.factory.annotation.Autowired; import org.springframework.http.ResponseEntity; import org.springframework.web.bind.annotation.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Map;
 
-@RestController @RequestMapping("/connection") public class RabbitMQConnectionController {
+@RestController
+@RequestMapping("/connection")
+public class RabbitMQConnectionController {
+
     @Autowired
     private RabbitMQConnectionService connectionService;
+
+    @Autowired
+    private RabbitMQSender rabbitMQSender;
 
     @PostMapping("/connect")
     public ResponseEntity<String> connect(@RequestBody Map<String, String> params) {
@@ -15,6 +25,8 @@ import java.util.Map;
 
         try {
             connectionService.connect(host, port, username, password);
+            // Refresh RabbitTemplate in sender with new connection data
+            rabbitMQSender.refreshRabbitTemplate();
             return ResponseEntity.ok("Connected successfully");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Connection failed: " + e.getMessage());
@@ -24,6 +36,8 @@ import java.util.Map;
     @PostMapping("/disconnect")
     public ResponseEntity<String> disconnect() {
         connectionService.disconnect();
+        // Optional: clear sender RabbitTemplate on disconnect
+        rabbitMQSender.refreshRabbitTemplate(); // this will nullify the template if disconnected
         return ResponseEntity.ok("Disconnected successfully");
     }
 
@@ -33,5 +47,4 @@ import java.util.Map;
                 ? ResponseEntity.ok("Connected")
                 : ResponseEntity.ok("Disconnected");
     }
-
 }

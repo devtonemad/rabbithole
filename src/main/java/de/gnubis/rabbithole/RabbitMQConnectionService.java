@@ -2,6 +2,7 @@ package de.gnubis.rabbithole;
 
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -11,6 +12,11 @@ import java.util.concurrent.TimeoutException;
 public class RabbitMQConnectionService {
 
     private Connection connection;
+
+    private String host;
+    private int port;
+    private String username;
+    private String password;
 
     /**
      * Attempts to establish a new connection to RabbitMQ broker with given parameters.
@@ -25,6 +31,11 @@ public class RabbitMQConnectionService {
      */
     public synchronized void connect(String host, int port, String username, String password) throws IOException, TimeoutException {
         disconnect(); // close existing connection if any
+
+        this.host = host;
+        this.port = port;
+        this.username = username;
+        this.password = password;
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(host);
@@ -48,6 +59,10 @@ public class RabbitMQConnectionService {
                 connection = null;
             }
         }
+        host = null;
+        port = 0;
+        username = null;
+        password = null;
     }
 
     /**
@@ -56,5 +71,26 @@ public class RabbitMQConnectionService {
      */
     public boolean isConnected() {
         return connection != null && connection.isOpen();
+    }
+
+    /**
+     * Returns the currently used com.rabbitmq.client.Connection instance
+     */
+    public Connection getConnection() {
+        return connection;
+    }
+
+    /**
+     * Returns a new Spring AMQP CachingConnectionFactory configured with current connection parameters.
+     * Throws IllegalStateException if not connected or parameters missing.
+     */
+    public CachingConnectionFactory createSpringConnectionFactory() {
+        if (host == null || username == null || password == null || port == 0) {
+            throw new IllegalStateException("Connection parameters are not set");
+        }
+        CachingConnectionFactory cachingConnFactory = new CachingConnectionFactory(host, port);
+        cachingConnFactory.setUsername(username);
+        cachingConnFactory.setPassword(password);
+        return cachingConnFactory;
     }
 }
