@@ -225,15 +225,86 @@
             expanded = !expanded;
         });
 
-        connectBtn.addEventListener('click', () => {
-            connectBtn.disabled = true;
-            disconnectBtn.disabled = false;
+        function updateUIConnected(connected) {
+            if (connected) {
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                statusLabel.textContent = 'Connected';
+                statusLabel.style.color = 'green';
+            } else {
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                statusLabel.textContent = 'Disconnected';
+                statusLabel.style.color = 'red';
+            }
+        }
+
+        async function checkStatus() {
+            try {
+                const response = await fetch('/connection/status');
+                const text = await response.text();
+                updateUIConnected(text.trim() === 'Connected');
+            } catch (err) {
+                updateUIConnected(false);
+            }
+        }
+        connectBtn.addEventListener('click', async () => {
+            const host = document.getElementById('hostInput').value;
+            const port = document.getElementById('portInput').value;
+            const username = document.getElementById('usernameInput').value;
+            const password = document.getElementById('passwordInput').value;
+
+            try {
+                const response = await fetch('/connection/connect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ host, port, username, password }),
+                });
+                if (response.ok) {
+                    const message = await response.text();
+                    alert(message);
+                    updateUIConnected(true);
+                } else {
+                    const errorMessage = await response.text();
+                    alert('Connection failed: ' + errorMessage);
+                    updateUIConnected(false);
+                }
+            } catch (err) {
+                alert('Error connecting: ' + err.message);
+                updateUIConnected(false);
+            }
         });
 
-        disconnectBtn.addEventListener('click', () => {
-            connectBtn.disabled = false;
-            disconnectBtn.disabled = true;
+        disconnectBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/connection/disconnect', { method: 'POST' });
+                if (response.ok) {
+                    const message = await response.text();
+                    alert(message);
+                    updateUIConnected(false);
+                } else {
+                    alert('Error disconnecting');
+                }
+            } catch (err) {
+                alert('Error disconnecting: ' + err.message);
+            }
         });
+
+        checkStatus();
+
+
+
+
+
+        // connectBtn.addEventListener('click', () => {
+        //     connectBtn.disabled = true;
+        //     disconnectBtn.disabled = false;
+        // });
+        //
+        // disconnectBtn.addEventListener('click', () => {
+        //     connectBtn.disabled = false;
+        //     disconnectBtn.disabled = true;
+        // });
     });
 </script>
 
