@@ -77,7 +77,7 @@
                         alert('Error receiving messages.');
                     });
             });
-            const form = document.querySelector('form');
+            const form = document.getElementById('sendForm');
             const sentMessages = JSON.parse(localStorage.getItem('sentMessages')) || [];
 
             const updateSentMessages = (message) => {
@@ -146,7 +146,10 @@
 
                 fetch('/send', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
                 })
                     .then(response => {
                         if (response.ok) {
@@ -243,8 +246,8 @@
             <h2>Send Message</h2>
             <div id="sendSection">
 
-                <form th:action="@{/send}" method="post">
-                    <label for="destinationType">Destination Type:</label>
+                <form id="sendForm">
+                <label for="destinationType">Destination Type:</label>
                     <select id="destinationType" name="destinationType" required>
                         <option value="queue" th:selected="${destinationType == 'queue'}">Queue</option>
                         <option value="exchange" th:selected="${destinationType == 'exchange'}">Exchange</option>
