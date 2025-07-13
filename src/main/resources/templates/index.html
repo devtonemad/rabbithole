@@ -10,6 +10,7 @@
             min-height: 500px;
         }
 
+
         .split-panel {
             flex: 1;
             padding: 20px;
@@ -186,26 +187,27 @@
 
     <div id="connectionFormContainer" style="transition: max-height 0.3s ease; overflow: hidden;">
         <form id="connectionForm">
-            <label for="host">Host:</label>
-            <input type="text" id="host" name="host" value="localhost" required><br><br>
+            <label for="hostInput">Host:</label>
+            <input type="text" id="hostInput" name="host" value="localhost" required><br><br>
 
-            <label for="port">Port:</label>
-            <input type="number" id="port" name="port" value="5672" required><br><br>
+            <label for="portInput">Port:</label>
+            <input type="number" id="portInput" name="port" value="5672" required><br><br>
 
             <label for="streamPort">Stream Port:</label>
             <input type="number" id="streamPort" name="streamPort" value="5552" required><br><br>
 
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" value="guest" required><br><br>
+            <label for="usernameInput">Username:</label>
+            <input type="text" id="usernameInput" name="username" value="guest" required><br><br>
 
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" value="guest" required><br><br>
+            <label for="passwordInput">Password:</label>
+            <input type="password" id="passwordInput" name="password" value="guest" required><br><br>
         </form>
+        <div id="statusLabel" style="margin-top: 10px; font-weight: bold;">Disconnected</div>
     </div>
-</div>
+    </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
         const toggleBtn = document.getElementById('toggleConnectionBtn');
         const formContainer = document.getElementById('connectionFormContainer');
         const connectBtn = document.getElementById('connectBtn');
@@ -228,15 +230,98 @@
             expanded = !expanded;
         });
 
-        connectBtn.addEventListener('click', () => {
-            connectBtn.disabled = true;
-            disconnectBtn.disabled = false;
+        function updateUIConnected(connected) {
+            if (connected) {
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                statusLabel.textContent = 'Connected';
+                statusLabel.style.color = 'green';
+            } else {
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                statusLabel.textContent = 'Disconnected';
+                statusLabel.style.color = 'red';
+            }
+        }
+
+        async function checkStatus() {
+            try {
+                const response = await fetch('/connection/status');
+                const text = await response.text();
+                updateUIConnected(text.trim() === 'Connected');
+            } catch (err) {
+                updateUIConnected(false);
+            }
+        }
+        connectBtn.addEventListener('click', async () => {
+            console.log('Connect button clicked');
+            const form = document.getElementById('connectionForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            const host = document.getElementById('hostInput').value;
+            const streamPort = document.getElementById('streamPort').value;
+            const port = document.getElementById('portInput').value;
+            const username = document.getElementById('usernameInput').value;
+            const password = document.getElementById('passwordInput').value;
+
+            console.log('Connection parameters:', {host, port, streamPort, username});
+
+            try {
+                const response = await fetch('/connection/connect', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({host, port, streamPort, username, password}),
+                });
+                if (response.ok) {
+                    const message = await response.text();
+                    console.log('Connection successful:', message);
+                    alert(message);
+                    updateUIConnected(true);
+                } else {
+                    const errorMessage = await response.text();
+                    console.error('Connection failed:', errorMessage);
+                    alert('Connection failed: ' + errorMessage);
+                    updateUIConnected(false);
+                }
+            } catch (err) {
+                console.error('Connection error:', err);
+                alert('Error connecting: ' + err.message);
+                updateUIConnected(false);
+            }
         });
 
-        disconnectBtn.addEventListener('click', () => {
-            connectBtn.disabled = false;
-            disconnectBtn.disabled = true;
+        disconnectBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/connection/disconnect', { method: 'POST' });
+                if (response.ok) {
+                    const message = await response.text();
+                    alert(message);
+                    updateUIConnected(false);
+                } else {
+                    alert('Error disconnecting');
+                }
+            } catch (err) {
+                alert('Error disconnecting: ' + err.message);
+            }
         });
+
+        checkStatus();
+
+
+
+
+
+        // connectBtn.addEventListener('click', () => {
+        //     connectBtn.disabled = true;
+        //     disconnectBtn.disabled = false;
+        // });
+        //
+        // disconnectBtn.addEventListener('click', () => {
+        //     connectBtn.disabled = false;
+        //     disconnectBtn.disabled = true;
+        // });
     });
 </script>
 
