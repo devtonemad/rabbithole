@@ -14,6 +14,9 @@ public class RabbitMQConnectionController {
     private RabbitMQConnectionService connectionService;
 
     @Autowired
+    private RabbitMQReceiver rabbitMQReceiver;
+
+    @Autowired
     private RabbitMQSender rabbitMQSender;
 
     @PostMapping("/connect")
@@ -27,6 +30,7 @@ public class RabbitMQConnectionController {
             connectionService.connect(host, port, username, password);
             // Refresh RabbitTemplate in sender with new connection data
             rabbitMQSender.refreshRabbitTemplate();
+//            rabbitMQReceiver.refreshResources();
             return ResponseEntity.ok("Connected successfully");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Connection failed: " + e.getMessage());
@@ -38,6 +42,7 @@ public class RabbitMQConnectionController {
         connectionService.disconnect();
         // Optional: clear sender RabbitTemplate on disconnect
         rabbitMQSender.refreshRabbitTemplate(); // this will nullify the template if disconnected
+//        rabbitMQReceiver.refreshResources();
         return ResponseEntity.ok("Disconnected successfully");
     }
 
