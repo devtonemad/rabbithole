@@ -23,14 +23,15 @@ public class RabbitMQConnectionController {
     public ResponseEntity<String> connect(@RequestBody Map<String, String> params) {
         String host = params.get("host");
         int port = Integer.parseInt(params.get("port"));
+        int streamPort = Integer.parseInt(params.get("streamPort"));
         String username = params.get("username");
         String password = params.get("password");
 
         try {
-            connectionService.connect(host, port, username, password);
+            connectionService.connect(host, port, streamPort, username, password);
             // Refresh RabbitTemplate in sender with new connection data
             rabbitMQSender.refreshRabbitTemplate();
-//            rabbitMQReceiver.refreshResources();
+            rabbitMQReceiver.refreshResources();
             return ResponseEntity.ok("Connected successfully");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Connection failed: " + e.getMessage());
@@ -42,7 +43,7 @@ public class RabbitMQConnectionController {
         connectionService.disconnect();
         // Optional: clear sender RabbitTemplate on disconnect
         rabbitMQSender.refreshRabbitTemplate(); // this will nullify the template if disconnected
-//        rabbitMQReceiver.refreshResources();
+        rabbitMQReceiver.refreshResources();
         return ResponseEntity.ok("Disconnected successfully");
     }
 

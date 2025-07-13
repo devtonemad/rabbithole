@@ -15,6 +15,7 @@ public class RabbitMQConnectionService {
 
     private String host;
     private int port;
+    private int streamPort;
     private String username;
     private String password;
 
@@ -22,18 +23,20 @@ public class RabbitMQConnectionService {
      * Attempts to establish a new connection to RabbitMQ broker with given parameters.
      * If a connection is already open, it will be closed and replaced.
      *
-     * @param host     RabbitMQ host
-     * @param port     RabbitMQ port
-     * @param username username for RabbitMQ
-     * @param password password for RabbitMQ
+     * @param host      RabbitMQ host
+     * @param port      RabbitMQ port
+     * @param streamPort RabbitMQ stream port
+     * @param username  username for RabbitMQ
+     * @param password  password for RabbitMQ
      * @throws IOException
      * @throws TimeoutException
      */
-    public synchronized void connect(String host, int port, String username, String password) throws IOException, TimeoutException {
+    public synchronized void connect(String host, int port, int streamPort, String username, String password) throws IOException, TimeoutException {
         disconnect(); // close existing connection if any
 
         this.host = host;
         this.port = port;
+        this.streamPort = streamPort;
         this.username = username;
         this.password = password;
 
@@ -61,6 +64,7 @@ public class RabbitMQConnectionService {
         }
         host = null;
         port = 0;
+        streamPort = 0;
         username = null;
         password = null;
     }
@@ -108,6 +112,10 @@ public class RabbitMQConnectionService {
 
     public String getPassword() {
         return password;
+    }
+
+    public int getStreamPort() {
+        return streamPort;
     }
 
 }

@@ -10,6 +10,7 @@
             min-height: 500px;
         }
 
+
         .split-panel {
             flex: 1;
             padding: 20px;
@@ -260,17 +261,18 @@
                 return;
             }
             const host = document.getElementById('hostInput').value;
+            const streamPort = document.getElementById('streamPort').value;
             const port = document.getElementById('portInput').value;
             const username = document.getElementById('usernameInput').value;
             const password = document.getElementById('passwordInput').value;
 
-            console.log('Connection parameters:', {host, port, username});
+            console.log('Connection parameters:', {host, port, streamPort, username});
 
             try {
                 const response = await fetch('/connection/connect', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({host, port, username, password}),
+                    body: JSON.stringify({host, port, streamPort, username, password}),
                 });
                 if (response.ok) {
                     const message = await response.text();

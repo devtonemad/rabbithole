@@ -41,7 +41,7 @@ public class RabbitMQReceiver {
             // Create Environment for streams
             this.environment = Environment.builder()
                     .host(connectionService.getHost())
-                    .port(connectionService.getPort())
+                    .port(connectionService.getStreamPort())
                     .username(connectionService.getUsername())
                     .password(connectionService.getPassword())
                     .build();
