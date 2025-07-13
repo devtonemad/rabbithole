@@ -174,7 +174,14 @@
 <div class="content">
     <!-- Connection Settings Panel -->
     <div id="connectionPanel" style="margin-bottom: 30px; padding: 20px; border: 1px solid #ccc; border-radius: 5px; background-color: #e9f4e9;">
-        <h2>Connection Settings</h2>
+    <h2 style="display: flex; align-items: center;">
+        <button type="button" id="toggleConnectionBtn" aria-expanded="true" aria-controls="connectionFormContainer" style="margin-right: 15px;">Collapse ▲</button>
+        <span style="flex-grow: 1;">Connection Settings</span>
+        <button type="button" id="connectBtn" style="margin-left: 10px; margin-right: 10px;">Connect</button>
+        <button type="button" id="disconnectBtn" disabled>Disconnect</button>
+    </h2>
+
+    <div id="connectionFormContainer" style="transition: max-height 0.3s ease; overflow: hidden;">
         <form id="connectionForm">
             <label for="host">Host:</label>
             <input type="text" id="host" name="host" value="localhost" required><br><br>
@@ -190,12 +197,45 @@
 
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" value="guest" required><br><br>
-
-            <button type="button" id="connectBtn">Connect</button>
-            <button type="button" id="disconnectBtn" disabled>Disconnect</button>
-            <span id="connectionStatus" style="margin-left: 15px; font-weight: bold; color: green;"></span>
         </form>
     </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggleBtn = document.getElementById('toggleConnectionBtn');
+        const formContainer = document.getElementById('connectionFormContainer');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+
+        let expanded = true;
+        const formHeight = formContainer.scrollHeight + 'px';
+        formContainer.style.maxHeight = formHeight;
+
+        toggleBtn.addEventListener('click', () => {
+            if (expanded) {
+                formContainer.style.maxHeight = '0';
+                toggleBtn.textContent = 'Expand ▼';
+                toggleBtn.setAttribute('aria-expanded', 'false');
+            } else {
+                formContainer.style.maxHeight = formHeight;
+                toggleBtn.textContent = 'Collapse ▲';
+                toggleBtn.setAttribute('aria-expanded', 'true');
+            }
+            expanded = !expanded;
+        });
+
+        connectBtn.addEventListener('click', () => {
+            connectBtn.disabled = true;
+            disconnectBtn.disabled = false;
+        });
+
+        disconnectBtn.addEventListener('click', () => {
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+        });
+    });
+</script>
 
     <!-- Existing send/receive UI as is below -->
     <div class="split-container">
