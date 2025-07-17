@@ -178,6 +178,9 @@
 <div class="content">
     <!-- Connection Settings Panel -->
     <div id="connectionPanel" style="margin-bottom: 30px; padding: 20px; border: 1px solid #ccc; border-radius: 5px; background-color: #e9f4e9;">
+    <!-- Moved status label here for always visible -->
+    <div id="statusLabel" style="margin-bottom: 10px; font-weight: bold;">Disconnected</div>
+
     <h2 style="display: flex; align-items: center;">
         <button type="button" id="toggleConnectionBtn" aria-expanded="true" aria-controls="connectionFormContainer" style="margin-right: 15px;">Collapse ▲</button>
         <span style="flex-grow: 1;">Connection Settings</span>
@@ -202,9 +205,8 @@
             <label for="passwordInput">Password:</label>
             <input type="password" id="passwordInput" name="password" value="guest" required><br><br>
         </form>
-        <div id="statusLabel" style="margin-top: 10px; font-weight: bold;">Disconnected</div>
     </div>
-    </div>
+</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
