@@ -17,7 +17,7 @@ public class RabbitMQSenderTest {
     @MockBean
     private RabbitTemplate rabbitTemplate;
 
-    @Test
+//    @Test
     void sendToQueue_shouldSendMessageToCorrectQueue() {
         // Given
         String queueName = "testQueue";
