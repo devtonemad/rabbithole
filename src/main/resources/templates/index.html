@@ -21,16 +21,42 @@
         .split-panel {
             flex: 1;
             padding: 20px;
-            width: 50%;
             overflow-y: auto;
         }
 
         .left {
-            border-right: 1px solid #ccc;
+            border-right: 1px solid var(--panel-border, #ccc);
+        }
+
+        .middle {
+            border-left: 1px solid var(--panel-border, #ccc);
+            border-right: 1px solid var(--panel-border, #ccc);
+            min-width: 260px;
+            max-width: 320px;
         }
 
         .right {
-            border-left: 1px solid #ccc;
+            border-left: 1px solid var(--panel-border, #ccc);
+        }
+
+        #scriptJson {
+            width: 100%;
+            min-height: 200px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            resize: vertical;
+            box-sizing: border-box;
+            background-color: var(--input-bg, #fff);
+            color: var(--text, #333);
+            border: 1px solid var(--input-border, #ccc);
+            border-radius: 3px;
+            padding: 8px;
+        }
+
+        #scriptStatus {
+            font-size: 0.85rem;
+            margin-top: 6px;
+            min-height: 1.2em;
         }
 
         input[type="text"], textarea {
@@ -103,6 +129,7 @@
                 sentMessages.forEach((msg, index) => {
                     const tr = document.createElement('tr');
                     const useButtonTd = document.createElement('td');
+
                     const useButton = document.createElement('button');
                     useButton.textContent = 'Use';
                     useButton.addEventListener('click', () => {
@@ -113,6 +140,12 @@
                         document.getElementById('message').value = msg.message;
                     });
                     useButtonTd.appendChild(useButton);
+
+                    const scriptButton = document.createElement('button');
+                    scriptButton.textContent = '+ Script';
+                    scriptButton.style.marginLeft = '4px';
+                    scriptButton.addEventListener('click', () => addToScript(msg));
+                    useButtonTd.appendChild(scriptButton);
                     const destinationTypeTd = document.createElement('td');
                     destinationTypeTd.textContent = msg.destinationType;
                     const destinationTd = document.createElement('td');
@@ -378,6 +411,17 @@
                 </div>
             </div>
         </div>
+        <div class="split-panel middle">
+            <h2>Script</h2>
+            <textarea id="scriptJson" readonly placeholder="No entries yet — click 'Use in Script' on a sent message."></textarea>
+            <div style="margin-top:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <label for="pauseMs">Pause (ms):</label>
+                <input type="number" id="pauseMs" value="1000" min="0" style="width:80px; margin:0;">
+                <button id="executeScriptBtn">▶ Execute</button>
+                <button id="clearScriptBtn" style="background:#888;">✕ Clear</button>
+            </div>
+            <div id="scriptStatus"></div>
+        </div>
         <div class="split-panel right">
             <h2>Receive Messages</h2>
             <div id="receiveSection">
@@ -414,6 +458,55 @@
         </div>
     </div>
 </div>
+<script>
+    (function() {
+        let scriptEntries = [];
+
+        function renderScriptPanel() {
+            const ta = document.getElementById('scriptJson');
+            ta.value = scriptEntries.length === 0 ? '' : JSON.stringify(scriptEntries, null, 2);
+        }
+
+        window.addToScript = function(msg) {
+            scriptEntries.push({
+                destinationType: msg.destinationType,
+                destination: msg.destination,
+                routingKey: msg.routingKey || '',
+                headers: msg.headers || '',
+                message: msg.message
+            });
+            renderScriptPanel();
+            document.getElementById('scriptStatus').textContent = scriptEntries.length + ' entry/entries in script.';
+        };
+
+        document.getElementById('clearScriptBtn').addEventListener('click', () => {
+            scriptEntries = [];
+            renderScriptPanel();
+            document.getElementById('scriptStatus').textContent = '';
+        });
+
+        document.getElementById('executeScriptBtn').addEventListener('click', async () => {
+            if (scriptEntries.length === 0) {
+                document.getElementById('scriptStatus').textContent = 'Script is empty.';
+                return;
+            }
+            const pauseMs = parseInt(document.getElementById('pauseMs').value) || 0;
+            const status = document.getElementById('scriptStatus');
+            status.textContent = 'Executing…';
+            try {
+                const response = await fetch('/script/execute', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({entries: scriptEntries, pauseMs})
+                });
+                const text = await response.text();
+                status.textContent = response.ok ? '✓ ' + text : '✗ ' + text;
+            } catch (e) {
+                document.getElementById('scriptStatus').textContent = '✗ Error: ' + e.message;
+            }
+        });
+    })();
+</script>
 <script>
     (function() {
         if (localStorage.getItem('darkMode') === 'on') {
