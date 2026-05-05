@@ -1,26 +1,56 @@
+:root {
+    --bg: #f2f2f2;
+    --text: #333;
+    --header-bg: #4c9a2a;
+    --form-bg: #6fbf4b;
+    --input-bg: #fff;
+    --input-border: #ccc;
+    --table-header-bg: #4c9a2a;
+    --table-header-text: #fff;
+    --table-border: #ccc;
+    --panel-bg: #e9f4e9;
+    --panel-border: #ccc;
+    --link: #ff9800;
+}
+
+body.dark-mode {
+    --bg: #1e1e1e;
+    --text: #ddd;
+    --header-bg: #2a5a17;
+    --form-bg: #2d4a20;
+    --input-bg: #2d2d2d;
+    --input-border: #555;
+    --table-header-bg: #2a5a17;
+    --table-header-text: #eee;
+    --table-border: #555;
+    --panel-bg: #252e22;
+    --panel-border: #444;
+    --link: #ffb74d;
+}
+
 body {
     font-family: Arial, sans-serif;
-    background-color: #f2f2f2;
-    color: #333;
+    background-color: var(--bg);
+    color: var(--text);
 }
 
 header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #4c9a2a; /* Match the green in the logo */
+    background-color: var(--header-bg);
     padding: 10px 20px;
     margin-bottom: 20px;
     border-radius: 5px;
 }
 
 header .logo {
-    height: 100px; /* Set the logo height to 100px */
+    height: 100px;
     margin-right: 20px;
 }
 
 header nav button {
-    background-color: #ff9800; /* Orange color from the logo */
+    background-color: #ff9800;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -30,15 +60,30 @@ header nav button {
 }
 
 header nav button:hover {
-    background-color: #e68900; /* Darker orange for hover effect */
+    background-color: #e68900;
+}
+
+#darkModeToggle {
+    background: none;
+    border: 2px solid rgba(255,255,255,0.6);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-left: 10px;
+}
+
+#darkModeToggle:hover {
+    background: rgba(255,255,255,0.15);
 }
 
 h1, h2 {
-    color: #333; /* Black text color */
+    color: var(--text);
 }
 
 form {
-    background-color: #6fbf4b; /* Lighter green to complement the header */
+    background-color: var(--form-bg);
     padding: 20px;
     border-radius: 5px;
     margin-bottom: 20px;
@@ -48,12 +93,14 @@ input, textarea, select {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
-    border: 1px solid #ccc;
+    border: 1px solid var(--input-border);
     border-radius: 3px;
+    background-color: var(--input-bg);
+    color: var(--text);
 }
 
 button {
-    background-color: #ff9800; /* Orange color from the logo */
+    background-color: #ff9800;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -62,11 +109,11 @@ button {
 }
 
 button:hover {
-    background-color: #e68900; /* Darker orange for hover effect */
+    background-color: #e68900;
 }
 
 a {
-    color: #ff9800; /* Orange color from the logo */
+    color: var(--link);
     text-decoration: none;
 }
 
@@ -81,23 +128,23 @@ table {
 }
 
 table, th, td {
-    border: 1px solid #ccc;
+    border: 1px solid var(--table-border);
 }
 
 th, td {
     padding: 10px;
     text-align: left;
-    white-space: nowrap; /* Ensure text does not wrap */
+    white-space: nowrap;
 }
 
 th {
-    background-color: #4c9a2a; /* Match the green in the logo */
-    color: #ffffff; /* White text color for better contrast */
+    background-color: var(--table-header-bg);
+    color: var(--table-header-text);
 }
 
 td button {
     padding: 5px 10px;
-    background-color: #ff9800; /* Orange color from the logo */
+    background-color: #ff9800;
     color: white;
     border: none;
     border-radius: 3px;
@@ -105,13 +152,14 @@ td button {
 }
 
 td button:hover {
-    background-color: #e68900; /* Darker orange for hover effect */
+    background-color: #e68900;
 }
 
 .content {
     text-align: center;
     padding: 50px;
 }
+
 input[type="text"], input[type="number"], input[type="password"], textarea {
     width: calc(100% - 20px);
     margin: 5px 0;
@@ -124,4 +172,9 @@ select {
     margin: 5px 0;
     padding: 8px;
     box-sizing: border-box;
+}
+
+#connectionPanel {
+    background-color: var(--panel-bg);
+    border-color: var(--panel-border);
 }
