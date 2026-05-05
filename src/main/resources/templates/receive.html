@@ -10,6 +10,7 @@
     <nav>
         <button onclick="location.href='/send'">Send Message</button>
         <button onclick="location.href='/receive'">Receive Messages</button>
+        <button id="darkModeToggle">🌙 Dark Mode</button>
     </nav>
 </header>
 <div class="content">
@@ -41,5 +42,18 @@
     </table>
 </div>
 <a th:href="@{/send}">Send a Message</a>
+<script>
+    (function() {
+        if (localStorage.getItem('darkMode') === 'on') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeToggle').textContent = '☀️ Light Mode';
+        }
+        document.getElementById('darkModeToggle').addEventListener('click', function() {
+            const on = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', on ? 'on' : 'off');
+            this.textContent = on ? '☀️ Light Mode' : '🌙 Dark Mode';
+        });
+    })();
+</script>
 </body>
 </html>

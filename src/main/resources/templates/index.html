@@ -3,6 +3,13 @@
 <head>
     <title>Home</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script>
+        (function() {
+            if (localStorage.getItem('darkMode') === 'on') {
+                document.documentElement.classList.add('dark-init');
+            }
+        })();
+    </script>
     <style>
         .split-container {
             display: flex;
@@ -14,16 +21,42 @@
         .split-panel {
             flex: 1;
             padding: 20px;
-            width: 50%;
             overflow-y: auto;
         }
 
         .left {
-            border-right: 1px solid #ccc;
+            border-right: 1px solid var(--panel-border, #ccc);
+        }
+
+        .middle {
+            border-left: 1px solid var(--panel-border, #ccc);
+            border-right: 1px solid var(--panel-border, #ccc);
+            min-width: 260px;
+            max-width: 320px;
         }
 
         .right {
-            border-left: 1px solid #ccc;
+            border-left: 1px solid var(--panel-border, #ccc);
+        }
+
+        #scriptJson {
+            width: 100%;
+            min-height: 200px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            resize: vertical;
+            box-sizing: border-box;
+            background-color: var(--input-bg, #fff);
+            color: var(--text, #333);
+            border: 1px solid var(--input-border, #ccc);
+            border-radius: 3px;
+            padding: 8px;
+        }
+
+        #scriptStatus {
+            font-size: 0.85rem;
+            margin-top: 6px;
+            min-height: 1.2em;
         }
 
         input[type="text"], textarea {
@@ -96,6 +129,7 @@
                 sentMessages.forEach((msg, index) => {
                     const tr = document.createElement('tr');
                     const useButtonTd = document.createElement('td');
+
                     const useButton = document.createElement('button');
                     useButton.textContent = 'Use';
                     useButton.addEventListener('click', () => {
@@ -106,6 +140,12 @@
                         document.getElementById('message').value = msg.message;
                     });
                     useButtonTd.appendChild(useButton);
+
+                    const scriptButton = document.createElement('button');
+                    scriptButton.textContent = '+ Script';
+                    scriptButton.style.marginLeft = '4px';
+                    scriptButton.addEventListener('click', () => addToScript(msg));
+                    useButtonTd.appendChild(scriptButton);
                     const destinationTypeTd = document.createElement('td');
                     destinationTypeTd.textContent = msg.destinationType;
                     const destinationTd = document.createElement('td');
@@ -174,10 +214,11 @@
 <header>
     <img src="/images/logo.png" alt="Logo" class="logo">
     <h1>RabbitHole</h1>
+    <button id="darkModeToggle">🌙 Dark Mode</button>
 </header>
 <div class="content">
     <!-- Connection Settings Panel -->
-    <div id="connectionPanel" style="margin-bottom: 30px; padding: 20px; border: 1px solid #ccc; border-radius: 5px; background-color: #e9f4e9;">
+    <div id="connectionPanel" style="margin-bottom: 30px; padding: 20px; border-radius: 5px;">
     <!-- Moved status label here for always visible -->
     <div id="statusLabel" style="margin-bottom: 10px; font-weight: bold;">Disconnected</div>
 
@@ -370,6 +411,17 @@
                 </div>
             </div>
         </div>
+        <div class="split-panel middle">
+            <h2>Script</h2>
+            <textarea id="scriptJson" placeholder="No entries yet — click '+ Script' on a sent message, or type JSON directly."></textarea>
+            <div style="margin-top:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <label for="pauseMs">Pause (ms):</label>
+                <input type="number" id="pauseMs" value="1000" min="0" style="width:80px; margin:0;">
+                <button id="executeScriptBtn">▶ Execute</button>
+                <button id="clearScriptBtn" style="background:#888;">✕ Clear</button>
+            </div>
+            <div id="scriptStatus"></div>
+        </div>
         <div class="split-panel right">
             <h2>Receive Messages</h2>
             <div id="receiveSection">
@@ -406,5 +458,95 @@
         </div>
     </div>
 </div>
+<script>
+    (function() {
+        let scriptEntries = [];
+
+        function renderScriptPanel() {
+            const ta = document.getElementById('scriptJson');
+            ta.value = scriptEntries.length === 0 ? '' : JSON.stringify(scriptEntries, null, 2);
+        }
+
+        window.addToScript = function(msg) {
+            scriptEntries.push({
+                destinationType: msg.destinationType,
+                destination: msg.destination,
+                routingKey: msg.routingKey || '',
+                headers: msg.headers || '',
+                message: msg.message
+            });
+            renderScriptPanel();
+            document.getElementById('scriptStatus').textContent = scriptEntries.length + ' entry/entries in script.';
+        };
+
+        document.getElementById('clearScriptBtn').addEventListener('click', () => {
+            scriptEntries = [];
+            renderScriptPanel();
+            document.getElementById('scriptStatus').textContent = '';
+        });
+
+        function validateScript(entries) {
+            if (!Array.isArray(entries)) return 'Script must be a JSON array.';
+            if (entries.length === 0) return 'Script is empty.';
+            const validTypes = ['queue', 'exchange', 'stream'];
+            for (let i = 0; i < entries.length; i++) {
+                const e = entries[i];
+                const prefix = 'Entry ' + (i + 1) + ': ';
+                if (typeof e !== 'object' || e === null) return prefix + 'must be an object.';
+                if (!e.destinationType) return prefix + '"destinationType" is required.';
+                if (!validTypes.includes(e.destinationType)) return prefix + '"destinationType" must be queue, exchange, or stream.';
+                if (!e.destination || e.destination.trim() === '') return prefix + '"destination" is required.';
+                if (!e.message || e.message.trim() === '') return prefix + '"message" is required.';
+            }
+            return null;
+        }
+
+        document.getElementById('executeScriptBtn').addEventListener('click', async () => {
+            const status = document.getElementById('scriptStatus');
+            const raw = document.getElementById('scriptJson').value.trim();
+            if (!raw) { status.textContent = 'Script is empty.'; return; }
+
+            let entries;
+            try {
+                entries = JSON.parse(raw);
+            } catch (e) {
+                status.textContent = '✗ Invalid JSON: ' + e.message;
+                return;
+            }
+
+            const error = validateScript(entries);
+            if (error) { status.textContent = '✗ ' + error; return; }
+
+            const pauseMs = parseInt(document.getElementById('pauseMs').value) || 0;
+            status.textContent = 'Executing…';
+            try {
+                const response = await fetch('/script/execute', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({entries, pauseMs})
+                });
+                const text = await response.text();
+                status.textContent = response.ok ? '✓ ' + text : '✗ ' + text;
+            } catch (e) {
+                status.textContent = '✗ Error: ' + e.message;
+            }
+        });
+    })();
+</script>
+<script>
+    (function() {
+        if (localStorage.getItem('darkMode') === 'on') {
+            document.body.classList.add('dark-mode');
+        }
+        document.getElementById('darkModeToggle').addEventListener('click', function() {
+            const on = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', on ? 'on' : 'off');
+            this.textContent = on ? '☀️ Light Mode' : '🌙 Dark Mode';
+        });
+        if (localStorage.getItem('darkMode') === 'on') {
+            document.getElementById('darkModeToggle').textContent = '☀️ Light Mode';
+        }
+    })();
+</script>
 </body>
 </html>
