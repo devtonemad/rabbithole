@@ -413,7 +413,7 @@
         </div>
         <div class="split-panel middle">
             <h2>Script</h2>
-            <textarea id="scriptJson" readonly placeholder="No entries yet — click 'Use in Script' on a sent message."></textarea>
+            <textarea id="scriptJson" placeholder="No entries yet — click '+ Script' on a sent message, or type JSON directly."></textarea>
             <div style="margin-top:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                 <label for="pauseMs">Pause (ms):</label>
                 <input type="number" id="pauseMs" value="1000" min="0" style="width:80px; margin:0;">
@@ -485,24 +485,50 @@
             document.getElementById('scriptStatus').textContent = '';
         });
 
+        function validateScript(entries) {
+            if (!Array.isArray(entries)) return 'Script must be a JSON array.';
+            if (entries.length === 0) return 'Script is empty.';
+            const validTypes = ['queue', 'exchange', 'stream'];
+            for (let i = 0; i < entries.length; i++) {
+                const e = entries[i];
+                const prefix = 'Entry ' + (i + 1) + ': ';
+                if (typeof e !== 'object' || e === null) return prefix + 'must be an object.';
+                if (!e.destinationType) return prefix + '"destinationType" is required.';
+                if (!validTypes.includes(e.destinationType)) return prefix + '"destinationType" must be queue, exchange, or stream.';
+                if (!e.destination || e.destination.trim() === '') return prefix + '"destination" is required.';
+                if (!e.message || e.message.trim() === '') return prefix + '"message" is required.';
+            }
+            return null;
+        }
+
         document.getElementById('executeScriptBtn').addEventListener('click', async () => {
-            if (scriptEntries.length === 0) {
-                document.getElementById('scriptStatus').textContent = 'Script is empty.';
+            const status = document.getElementById('scriptStatus');
+            const raw = document.getElementById('scriptJson').value.trim();
+            if (!raw) { status.textContent = 'Script is empty.'; return; }
+
+            let entries;
+            try {
+                entries = JSON.parse(raw);
+            } catch (e) {
+                status.textContent = '✗ Invalid JSON: ' + e.message;
                 return;
             }
+
+            const error = validateScript(entries);
+            if (error) { status.textContent = '✗ ' + error; return; }
+
             const pauseMs = parseInt(document.getElementById('pauseMs').value) || 0;
-            const status = document.getElementById('scriptStatus');
             status.textContent = 'Executing…';
             try {
                 const response = await fetch('/script/execute', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({entries: scriptEntries, pauseMs})
+                    body: JSON.stringify({entries, pauseMs})
                 });
                 const text = await response.text();
                 status.textContent = response.ok ? '✓ ' + text : '✗ ' + text;
             } catch (e) {
-                document.getElementById('scriptStatus').textContent = '✗ Error: ' + e.message;
+                status.textContent = '✗ Error: ' + e.message;
             }
         });
     })();
