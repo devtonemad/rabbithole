@@ -54,7 +54,7 @@ public class MessageController {
         } else if (destinationType.equals("exchange")) {
             rabbitMQSender.sendToExchange(destination, routingKey, message, headersMap);
         } else if (destinationType.equals("stream")) {
-            rabbitMQSender.sendToStream(destination, message);
+            rabbitMQSender.sendToStream(destination, message, headersMap);
         }
 
         // Add attributes to the redirect

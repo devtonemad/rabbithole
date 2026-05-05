@@ -56,10 +56,15 @@ public class RabbitMQSender {
         rabbitTemplate.send(exchange, routingKey, new Message(message.getBytes(), messageProperties));
     }
 
-    public void sendToStream(String stream, String message) {
+    public void sendToStream(String stream, String message, Map<String, Object> headers) {
         if (rabbitTemplate == null) {
             throw new IllegalStateException("RabbitTemplate is not initialized. Connect first.");
         }
-        rabbitTemplate.convertAndSend(stream, message);
+        MessageProperties messageProperties = new MessageProperties();
+        messageProperties.setContentType("application/json");
+        if (headers != null && !headers.isEmpty()) {
+            headers.forEach(messageProperties::setHeader);
+        }
+        rabbitTemplate.send(stream, new Message(message.getBytes(), messageProperties));
     }
 }

@@ -6,9 +6,12 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class RabbitMQReceiver {
@@ -81,7 +84,17 @@ public class RabbitMQReceiver {
                     .stream(source)
                     .offset(offsetSpec)
                     .messageHandler((context, message) -> {
-                        String content = "[Offset: " + context.offset() + "] " + new String(message.getBodyAsBinary());
+                        Map<String, Object> headers = message.getApplicationProperties();
+                        String headerOutput = (headers == null || headers.isEmpty())
+                                ? "keine Header vorhanden"
+                                : headers.entrySet().stream()
+                                  .map(e -> e.getKey() + "=" + e.getValue())
+                                  .collect(Collectors.joining("; "));
+
+                        String content = "[Offset: " + context.offset() + "] "
+                                + new String(message.getBodyAsBinary(), StandardCharsets.UTF_8)
+                                + " | Headers: " + headerOutput;
+
                         synchronized (messages) {
                             messages.add(content);
                         }
