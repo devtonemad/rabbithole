@@ -40,7 +40,7 @@ public class MessageController {
                               RedirectAttributes redirectAttributes) {
         Map<String, Object> headersMap = new HashMap<>();
         if (!headers.isEmpty()) {
-            String[] headersArray = headers.split(",");
+            String[] headersArray = headers.split("[,\\s]+");
             for (String header : headersArray) {
                 String[] keyValue = header.split(":");
                 if (keyValue.length == 2) {
