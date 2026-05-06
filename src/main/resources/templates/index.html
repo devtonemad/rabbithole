@@ -99,11 +99,7 @@
 
                         receivedMessagesBody.innerHTML = '';
                         messages.forEach(message => {
-                            const tr = document.createElement('tr');
-                            const td = document.createElement('td');
-                            td.textContent = message;
-                            tr.appendChild(td);
-                            receivedMessagesBody.appendChild(tr);
+                            receivedMessagesBody.appendChild(buildReceivedRow(message));
                         });
                     })
                     .catch(error => {
@@ -443,11 +439,13 @@
                     <table>
                         <thead>
                         <tr>
+                            <th>Actions</th>
                             <th>Message</th>
                         </tr>
                         </thead>
                         <tbody id="receivedMessagesBody" >
                         <tr th:each="message : ${messages}">
+                            <td></td>
                             <td th:text="${message}"></td>
                         </tr>
                         </tbody>
@@ -459,6 +457,62 @@
     </div>
 </div>
 <script>
+    function parseReceivedMessage(text) {
+        // Stream format: "[Offset: X] body | Headers: key=val; key2=val2"
+        // Queue format: raw body string
+        const streamMatch = text.match(/^\[Offset: \d+\] ([\s\S]*?) \| Headers: ([\s\S]*)$/);
+        if (streamMatch) {
+            const body = streamMatch[1];
+            const rawHeaders = streamMatch[2];
+            const headers = rawHeaders === 'keine Header vorhanden' ? '' :
+                rawHeaders.split('; ').map(h => h.replace('=', ':')).join(' ');
+            return { body, headers };
+        }
+        return { body: text, headers: '' };
+    }
+
+    function buildReceivedRow(message) {
+        const tr = document.createElement('tr');
+
+        const actionTd = document.createElement('td');
+        actionTd.style.whiteSpace = 'nowrap';
+
+        const useBtn = document.createElement('button');
+        useBtn.textContent = '→ Send';
+        useBtn.style.marginRight = '4px';
+        useBtn.addEventListener('click', () => {
+            const { body, headers } = parseReceivedMessage(message);
+            document.getElementById('destinationType').value = document.getElementById('sourceType').value;
+            document.getElementById('destination').value = document.getElementById('source').value;
+            document.getElementById('routingKey').value = '';
+            document.getElementById('headers').value = headers;
+            document.getElementById('message').value = body;
+        });
+
+        const scriptBtn = document.createElement('button');
+        scriptBtn.textContent = '+ Script';
+        scriptBtn.addEventListener('click', () => {
+            const { body, headers } = parseReceivedMessage(message);
+            window.addToScript({
+                destinationType: document.getElementById('sourceType').value,
+                destination: document.getElementById('source').value,
+                routingKey: '',
+                headers,
+                message: body
+            });
+        });
+
+        actionTd.appendChild(useBtn);
+        actionTd.appendChild(scriptBtn);
+
+        const msgTd = document.createElement('td');
+        msgTd.textContent = message;
+
+        tr.appendChild(actionTd);
+        tr.appendChild(msgTd);
+        return tr;
+    }
+
     (function() {
         let scriptEntries = [];
 
